@@ -6,7 +6,7 @@ import com.google.common.base.Strings;
  * Access Token
  * Created by gaoht on 15/6/27.
  */
-public class AccessToken extends Error {
+public class AccessTokenProtocol extends Error {
     private String access_token;
 
     private String expires_in;

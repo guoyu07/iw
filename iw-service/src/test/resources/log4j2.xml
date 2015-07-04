@@ -10,6 +10,13 @@
         <Logger name="cn.gaohongtao" additivity="false" level="debug">
             <appender-ref ref="Console" />
         </Logger>
+        <Logger name="org.mongodb.driver" additivity="false" level="info">
+            <appender-ref ref="Console" />
+        </Logger>
+        <Logger name="org.mongodb.driver.protocol" additivity="false" level="trace">
+            <appender-ref ref="Console" />
+        </Logger>
+
 
         <Root level="ERROR">
             <AppenderRef ref="Console" />

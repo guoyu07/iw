@@ -1,5 +1,6 @@
 package cn.gaohongtao.iw.common;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +13,12 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
 /**
+ * Http util
  * Created by gaoht on 15/6/27.
  */
 public class Http {
@@ -24,7 +27,6 @@ public class Http {
     protected WebTarget webTarget;
 
     public Http() {
-
         client = ClientBuilder.newBuilder().register(JacksonFeature.class).build();
     }
 
@@ -39,14 +41,14 @@ public class Http {
     }
 
     public <RESPONSE> RESPONSE get(Class<RESPONSE> responseClass) {
-        log.info("get :{}",this.webTarget.getUri().toString());
+        log.info("get :{}", this.webTarget.getUri().toString());
         Invocation.Builder builder = this.webTarget.request(MediaType.APPLICATION_JSON);
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            return builder.get(responseClass);
-        } catch (WebApplicationException e) {
-            Response r = builder.get();
-            log.error("request error code:{} response:{}", r.getStatus(), r.getEntity());
-            throw e;
+            // read from file, convert it to user class
+            return mapper.readValue(builder.get(String.class), responseClass);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
     }

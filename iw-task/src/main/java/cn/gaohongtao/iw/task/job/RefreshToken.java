@@ -4,7 +4,7 @@ import cn.gaohongtao.iw.common.Constant;
 import cn.gaohongtao.iw.common.Http;
 import cn.gaohongtao.iw.common.Https;
 import cn.gaohongtao.iw.common.config.Config;
-import cn.gaohongtao.iw.common.protocol.AccessToken;
+import cn.gaohongtao.iw.common.protocol.AccessTokenProtocol;
 import cn.gaohongtao.iw.common.protocol.Error;
 import com.google.common.base.Strings;
 import org.quartz.Job;
@@ -28,11 +28,11 @@ public class RefreshToken implements Job {
 
         log.info("start fresh token");
         try {
-            AccessToken t = new Https().path("https://api.weixin.qq.com/cgi-bin/token")
+            AccessTokenProtocol t = new Https().path("https://api.weixin.qq.com/cgi-bin/token")
                     .param("grant_type", "client_credential")
                     .param("appid", Constant.APP_ID)
                     .param("secret", Constant.APP_SECRET)
-                    .get(AccessToken.class);
+                    .get(AccessTokenProtocol.class);
 
             if (Strings.isNullOrEmpty(t.getErrcode())) {
                 log.info("{}", t);
@@ -54,7 +54,7 @@ public class RefreshToken implements Job {
             }
             errNum = 0;
         } catch (Exception e) {
-            log.info("--- Error {} in job!", ++errNum);
+            log.info("--- Error {} in job!", ++errNum, e);
             if (errNum > 1000) {
                 JobExecutionException e2 =
                         new JobExecutionException(e);
