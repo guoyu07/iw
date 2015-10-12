@@ -70,4 +70,29 @@ public class ProductListRequest {
                 ", lastSymbol='" + lastSymbol + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProductListRequest)) return false;
+
+        ProductListRequest that = (ProductListRequest) o;
+
+        if (pageSize != that.pageSize) return false;
+        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
+        if (strategy != null ? !strategy.equals(that.strategy) : that.strategy != null) return false;
+        if (condition != null ? !condition.equals(that.condition) : that.condition != null) return false;
+        return !(lastSymbol != null ? !lastSymbol.equals(that.lastSymbol) : that.lastSymbol != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = userId != null ? userId.hashCode() : 0;
+        result = 31 * result + (strategy != null ? strategy.hashCode() : 0);
+        result = 31 * result + (condition != null ? condition.hashCode() : 0);
+        result = 31 * result + pageSize;
+        result = 31 * result + (lastSymbol != null ? lastSymbol.hashCode() : 0);
+        return result;
+    }
 }

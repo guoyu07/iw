@@ -1,0 +1,12 @@
+{
+  "serviceList": [
+    "127.0.0.1:8080"
+  ],
+  "mongoConfig": {
+    "seeds": [
+      "127.0.0.1",
+      "27017"
+    ],
+    "maxConnectionsPerHost": 300
+  }
+}

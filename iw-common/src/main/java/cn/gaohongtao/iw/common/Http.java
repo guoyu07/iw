@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -47,6 +44,18 @@ public class Http {
         try {
             // read from file, convert it to user class
             return mapper.readValue(builder.get(String.class), responseClass);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public <REQUEST, RESPONSE> RESPONSE post(REQUEST request, Class<RESPONSE> responseClass) {
+        log.info("post :{}", this.webTarget.getUri().toString());
+        Invocation.Builder builder = this.webTarget.request();
+        try {
+            // read from file, convert it to user class
+            return builder.post(Entity.entity(request, MediaType.APPLICATION_XML), responseClass);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

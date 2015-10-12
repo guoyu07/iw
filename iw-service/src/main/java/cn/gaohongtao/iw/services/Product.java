@@ -6,6 +6,7 @@ import cn.gaohongtao.iw.protocol.ProductListResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.mongodb.client.MongoCollection;
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.glassfish.grizzly.http.util.FastDateFormat;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -35,20 +37,30 @@ public class Product {
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Consumes(MediaType.APPLICATION_JSON)
-    public ProductListResponse list(ProductListRequest request) throws ParseException {
+    public Response list(ProductListRequest request) throws ParseException {
         log.debug("Item list request: {}", request);
 
         List<Bson> conditionFilters = new ArrayList<>();
-        for (String key : request.getCondition().keySet()) {
-            conditionFilters.add(in(key, request.getCondition().get(key)));
-        }
+
+        if (request.getCondition() != null)
+            for (String key : request.getCondition().keySet()) {
+                conditionFilters.add(in(key, request.getCondition().get(key)));
+            }
+
         DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         if (!Strings.isNullOrEmpty(request.getLastSymbol()))
             conditionFilters.add(lt("onsale_date", format.parse(request.getLastSymbol())));
+
+        Bson filter;
+        if(conditionFilters.size()>0){
+            filter = and(conditionFilters);
+        }else{
+            filter = new BsonDocument();
+        }
         MongoCollection<Document> collection = MongoUtil.getDatabase("product").getCollection("list_" + request.getStrategy());
 
         List<Document> result = new ArrayList<>();
-        for (Document item : collection.find(and(conditionFilters))
+        for (Document item : collection.find(filter)
                 .projection(and(eq("size", 0), eq("colour", 0), eq("type", 0), eq("heel_height", 0)))
                 .sort(eq("onsale_date", -1)).limit(request.getPageSize())) {
             item.append("id", item.getString("_id"));
@@ -64,7 +76,32 @@ public class Product {
         }
         response.setItemList(result);
         log.debug("Item list response: {}", response);
-        return response;
+        return makeCORS(Response.ok().entity(response));
+    }
+
+    @OPTIONS
+    @Path("list")
+    public Response corsList(@HeaderParam("Access-Control-Request-Headers") String requestH) {
+        _corsHeaders = requestH;
+        return makeCORS(Response.ok(), requestH);
+    }
+
+    private String _corsHeaders;
+
+    private Response makeCORS(Response.ResponseBuilder req) {
+        return makeCORS(req, _corsHeaders);
+    }
+
+
+    private Response makeCORS(Response.ResponseBuilder req, String returnMethod) {
+        Response.ResponseBuilder rb = req.header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+
+        if (!"".equals(returnMethod)) {
+            rb.header("Access-Control-Allow-Headers", returnMethod);
+        }
+
+        return rb.build();
     }
 
 
