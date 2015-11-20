@@ -1,46 +1,66 @@
-package cn.gaohongtao.iw.protocol;
+package cn.gaohongtao.iw.protocol.wechat;
 
+import cn.gaohongtao.iw.common.Constant;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.UUID;
 
 /**
+ * 统一下单请求接口
+ * 
  * Created by gaoht on 15/7/21.
  */
 @XmlRootElement(name = "xml")
-public class PreorderRequest {
-
-    private String appid;
-
-    private String mch_id;
+public class UnifiedOrderRequest {
+    
+    @XmlElement(required = true)
+    private String appid = Constant.APP_ID;
+    
+    @XmlElement(required = true)
+    private String mch_id = Constant.MCH_ID;
 
     private String device_info = "WEB";
-
-    private String nonce_str = UUID.randomUUID().toString();
-
+    
+    @XmlElement(required = true)
+    private String nonce_str;
+    
+    @XmlElement(required = true)
     private String sign;
-
-    private String body;
+    
+    @XmlElement(required = true)
+    private String body = "iw";
 
     private String detail;
 
     private String attach;
-
+    
+    @XmlElement(required = true)
     private String out_trade_no;
-
-    private String fee_type = "CNY";
-
-    private int total_fee;
-
+    
+    private String fee_type;
+    
+    @XmlElement(required = true)
+    private Integer total_fee;
+    
+    @XmlElement(required = true)
     private String spbill_create_ip;
 
     private String time_start;
 
     private String time_expire;
-
-    private String notify_url = "http://www.gaohongtao.cn/iw/order/pay_notify";
-
+    
+    private String goods_tag;
+    
+    @XmlElement(required = true)
+    private String notify_url = "http://www.iwshoes.cn/service/iw/order/pay_notify";
+    
+    @XmlElement(required = true)
     private String trade_type = "JSAPI";
-
+    
+    private String product_id;
+    
+    private String limit_pay;
+    
+    @XmlElement(required = true)
     private String openid;
 
     public String getAppid() {
@@ -122,12 +142,12 @@ public class PreorderRequest {
     public void setFee_type(String fee_type) {
         this.fee_type = fee_type;
     }
-
-    public int getTotal_fee() {
+    
+    public Integer getTotal_fee() {
         return total_fee;
     }
-
-    public void setTotal_fee(int total_fee) {
+    
+    public void setTotal_fee(Integer total_fee) {
         this.total_fee = total_fee;
     }
 

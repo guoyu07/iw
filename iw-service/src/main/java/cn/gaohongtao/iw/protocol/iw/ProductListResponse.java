@@ -1,9 +1,7 @@
-package cn.gaohongtao.iw.protocol;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.bson.Document;
+package cn.gaohongtao.iw.protocol.iw;
 
 import java.util.List;
+import org.bson.Document;
 
 /**
  * Product list response
@@ -11,12 +9,12 @@ import java.util.List;
  * Created by gaoht on 15/7/2.
  */
 public class ProductListResponse {
-   public ProductListResponse(){}
-
-
     private String lastSymbol;
 
     private List<Document> itemList;
+    
+    public ProductListResponse() {
+    }
 
     public String getLastSymbol() {
         return lastSymbol;

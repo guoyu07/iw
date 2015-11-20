@@ -1,29 +1,35 @@
 package cn.gaohongtao.iw.services;
 
 import cn.gaohongtao.iw.common.MongoUtil;
-import cn.gaohongtao.iw.protocol.ProductListRequest;
-import cn.gaohongtao.iw.protocol.ProductListResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cn.gaohongtao.iw.protocol.iw.ProductListRequest;
+import cn.gaohongtao.iw.protocol.iw.ProductListResponse;
 import com.google.common.base.Strings;
 import com.mongodb.client.MongoCollection;
-import org.bson.BsonDocument;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.glassfish.grizzly.http.util.FastDateFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.OPTIONS;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import org.bson.BsonDocument;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.lt;
 
 /**
  * get user info
@@ -32,6 +38,8 @@ import static com.mongodb.client.model.Filters.*;
 @Path("product")
 public class Product {
     private static final Logger log = LoggerFactory.getLogger(Product.class);
+    
+    private String _corsHeaders;
 
     @POST
     @Path("list")
@@ -85,8 +93,6 @@ public class Product {
         _corsHeaders = requestH;
         return makeCORS(Response.ok(), requestH);
     }
-
-    private String _corsHeaders;
 
     private Response makeCORS(Response.ResponseBuilder req) {
         return makeCORS(req, _corsHeaders);

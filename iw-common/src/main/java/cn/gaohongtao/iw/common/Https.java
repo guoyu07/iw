@@ -1,17 +1,12 @@
 package cn.gaohongtao.iw.common;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.ClientBuilder;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * 微信https调用
@@ -26,12 +21,10 @@ public class Https extends Http {
         try {
             sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, null, null);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (KeyManagementException e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new RuntimeException(e);
         }
-
+    
         client = ClientBuilder.newBuilder().register(JacksonFeature.class).sslContext(sslContext).build();
     }
 }

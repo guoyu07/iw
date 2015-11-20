@@ -5,9 +5,10 @@ import cn.gaohongtao.iw.common.config.MongoConfig;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
-
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import org.bson.Document;
 
 /**
  * Mongo util
@@ -38,6 +39,25 @@ public class MongoUtil {
                 }
             }
         }, mongoConfig.build());
+    }
+    
+    public static Document convertToDocument(Object o) {
+        Document result = new Document();
+        Field[] fields = o.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object value;
+            try {
+                value = field.get(o);
+            } catch (IllegalAccessException e) {
+                continue;
+            }
+            if (value == null) {
+                continue;
+            }
+            result.append(field.getName(), value);
+        }
+        return result;
     }
 
 }
