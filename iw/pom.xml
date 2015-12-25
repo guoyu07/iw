@@ -9,7 +9,6 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>../iw-service</module>
-        <module>../iw-task</module>
         <module>../iw-common</module>
     </modules>
 

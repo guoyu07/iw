@@ -1,5 +1,7 @@
 package cn.gaohongtao.iw.common;
 
+import java.util.concurrent.TimeUnit;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
