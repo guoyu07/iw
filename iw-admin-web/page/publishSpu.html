@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="plugins/iCheck/all.css">
+
+<div class="box box-primary">
+  <!-- form start -->
+  <div role="form" id="form">
+    <div class="box-body">
+      <div class="form-group">
+        <label for="spuId">商品编码</label>
+        <input id="spuId" name="spuId" type="text" class="form-control" placeholder="Enter ...">
+      </div>
+      <div class="form-group">
+        <label for="spuName">商品名称</label>
+        <input id="spuName" name="name" type="text" class="form-control" placeholder="Enter ...">
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="radio" name="skuCatalog" class="minimal" value="1">
+          女鞋
+        </label>
+        <label>
+          <input type="radio" name="skuCatalog" class="minimal"  value="2">
+          服饰
+        </label>
+        <label>
+          <input type="radio" name="skuCatalog" class="minimal"  value="3">
+          男鞋
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="desc">商品描述</label>
+        <textarea id="desc" name="desc" class="form-control" rows="3" placeholder="Enter ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="color">颜色</label>
+        <input id="color" name="color" type="text" class="form-control" placeholder="尺码1&尺码2&尺码3">
+      </div>
+      <div class="form-group">
+        <label for="size">商品尺码</label>
+        <input id="size" name="size" type="text" class="form-control" placeholder="尺码1&尺码2&尺码3">
+      </div>
+      <div class="form-group">
+        <label for="price">商品原价</label>
+        <input id="price" name="price" type="text" class="form-control" placeholder="单位:元">
+      </div>
+      <div class="form-group">
+        <label for="discount">商品折扣价</label>
+        <input id="discount" name="discount" type="text" class="form-control" placeholder="单位:元">
+      </div>
+      <div class="form-group" id="image_box">
+      </div>
+      <div class="form-group">
+        <label for="count">库存数</label>
+        <input id="count" type="text" class="form-control" placeholder="单位:元">
+      </div>
+      <div class="form-group">
+        <label for="comment">备注</label>
+        <textarea id="comment" class="form-control" rows="3" placeholder="Enter ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
+      </div>
+
+    </div><!-- /.box-body -->
+
+  </div>
+  <div class="box-footer">
+    <button id="submit" class="btn btn-primary">发布</button>
+  </div>
+
+</div>
+<script src="plugins/iCheck/icheck.min.js"></script>
+<script type="text/javascript">
+
+//iCheck for checkbox and radio inputs
+$('input[type="radio"].minimal').iCheck({
+  radioClass: 'iradio_minimal-blue'
+});
+
+$("#submit").click(function(){
+  console.log($("#form").serializeJson())
+})
+$("#image_box").load("page/upload.html")
+</script>
