@@ -1,23 +1,16 @@
 package util
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/disintegration/gift"
 	"hash/crc32"
-	"image"
-	"image/gif"
-	"image/jpeg"
-	"image/png"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -51,10 +44,8 @@ func escape(s string) string {
 }
 
 func extractKey(r *http.Request) string {
-	// Use RequestURI instead of r.URL.Path, as we need the encoded form:
-	path := strings.Split(r.RequestURI, "?")[0]
-	// Also adjust double encoded slashes:
-	return strings.Replace(path[1:], "%252F", "%2F", -1)
+	r.ParseForm()
+	return r.FormValue("id")
 }
 
 func check(err error) {
@@ -64,16 +55,14 @@ func check(err error) {
 }
 
 type FileInfo struct {
-	Key          string `json:"-"`
-	ThumbnailKey string `json:"-"`
-	Url          string `json:"url,omitempty"`
-	ThumbnailUrl string `json:"thumbnailUrl,omitempty"`
-	Name         string `json:"name"`
-	Type         string `json:"type"`
-	Size         int64  `json:"size"`
-	Error        string `json:"error,omitempty"`
-	DeleteUrl    string `json:"deleteUrl,omitempty"`
-	DeleteType   string `json:"deleteType,omitempty"`
+	Key        string `json:"-"`
+	Url        string `json:"url,omitempty"`
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	Size       int64  `json:"size"`
+	Error      string `json:"error,omitempty"`
+	DeleteUrl  string `json:"deleteUrl,omitempty"`
+	DeleteType string `json:"deleteType,omitempty"`
 }
 
 func (fi *FileInfo) ValidateType() (valid bool) {
@@ -103,48 +92,13 @@ func (fi *FileInfo) CreateUrls(r *http.Request) {
 	}
 	uString := u.String()
 	fi.Url = uString + escape(string(fi.Name))
-	fi.DeleteUrl = fi.Url
+	u.Path = "/upload?id=" + fi.Key[:len(fi.Key)-1]
+	fi.DeleteUrl = u.String()
 	fi.DeleteType = "DELETE"
-	if fi.ThumbnailKey != "" {
-		fi.ThumbnailUrl = "/image/" + fi.ThumbnailKey
-	}
 }
 
 func (fi *FileInfo) SetKey(checksum uint32) {
 	fi.Key = escape(fmt.Sprint(checksum)) + "/"
-}
-
-func (fi *FileInfo) createThumb(buffer *bytes.Buffer) {
-	if imageTypes.MatchString(fi.Type) {
-		src, _, err := image.Decode(bytes.NewReader(buffer.Bytes()))
-		check(err)
-		filter := gift.New(gift.ResizeToFit(
-			THUMB_MAX_WIDTH,
-			THUMB_MAX_HEIGHT,
-			gift.LanczosResampling,
-		))
-		dst := image.NewNRGBA(filter.Bounds(src.Bounds()))
-		filter.Draw(dst, src)
-		buffer.Reset()
-		bWriter := bufio.NewWriter(buffer)
-		switch escape(fi.Type) {
-		case "image/jpeg", "image/pjpeg":
-			err = jpeg.Encode(bWriter, dst, nil)
-		case "image/gif":
-			err = gif.Encode(bWriter, dst, nil)
-		default:
-			err = png.Encode(bWriter, dst)
-		}
-		check(err)
-		bWriter.Flush()
-
-		thumbnailKey := fi.Key + "thumbnail" + thumbSuffix + filepath.Ext(fi.Name)
-		f, err := os.OpenFile(IMAGE_DIRECTORY+thumbnailKey, os.O_WRONLY|os.O_CREATE, 0666)
-		check(err)
-		defer f.Close()
-		io.Copy(f, buffer)
-		fi.ThumbnailKey = thumbnailKey
-	}
 }
 
 func handleUpload(r *http.Request, p *multipart.Part) (fi *FileInfo) {
@@ -180,9 +134,8 @@ func handleUpload(r *http.Request, p *multipart.Part) (fi *FileInfo) {
 	f, err := os.OpenFile(filePath+escape(string(fi.Name)), os.O_WRONLY|os.O_CREATE, 0666)
 	check(err)
 	defer f.Close()
-	io.Copy(f, bytes.NewBuffer(buffer.Bytes()))
+	io.Copy(f, &buffer)
 
-	fi.createThumb(bytes.NewBuffer(buffer.Bytes()))
 	fi.CreateUrls(r)
 	return
 }
@@ -261,29 +214,17 @@ func post(w http.ResponseWriter, r *http.Request) {
 
 func delete(w http.ResponseWriter, r *http.Request) {
 	key := extractKey(r)
-	parts := strings.Split(key, "/")
-	if len(parts) == 3 {
-		// result := make(map[string]bool, 1)
-		// context := appengine.NewContext(r)
-		// err := memcache.Delete(context, key)
-		// if err == nil {
-		// 	result[key] = true
-		// 	contentType, _ := url.QueryUnescape(parts[0])
-		// 	if imageTypes.MatchString(contentType) {
-		// 		thumbnailKey := key + thumbSuffix + filepath.Ext(parts[2])
-		// 		err := memcache.Delete(context, thumbnailKey)
-		// 		if err == nil {
-		// 			result[thumbnailKey] = true
-		// 		}
-		// 	}
-		// }
-		// w.Header().Set("Content-Type", "application/json")
-		// b, err := json.Marshal(result)
-		// check(err)
-		// fmt.Fprintln(w, string(b))
-	} else {
+	if key == "" {
 		http.Error(w, "405 Method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
+	err := os.RemoveAll(IMAGE_DIRECTORY + key)
+	result := make(map[string]bool, 1)
+	result[key] = true
+	w.Header().Set("Content-Type", "application/json")
+	b, err := json.Marshal(result)
+	check(err)
+	fmt.Fprintln(w, string(b))
 }
 
 func UploadHandle(w http.ResponseWriter, r *http.Request) {

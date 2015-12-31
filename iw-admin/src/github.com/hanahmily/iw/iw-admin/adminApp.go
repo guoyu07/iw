@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/md5"
 	"fmt"
+	"github.com/hanahmily/iw/iw-admin/service"
 	"github.com/hanahmily/iw/iw-admin/util"
 	"html/template"
 	"io"
@@ -27,7 +28,7 @@ func main() {
 		Timeout:    time.Hour,
 		MaxRefresh: time.Hour * 24,
 		Authenticator: func(userId string, password string) bool {
-			return userId == "admin" && password == "admin"
+			return userId == "iw-admin" && password == "admin"
 		}}
 
 	api := rest.NewApi()
@@ -35,13 +36,13 @@ func main() {
 	// we use the IfMiddleware to remove certain paths from needing authentication
 	api.Use(&rest.IfMiddleware{
 		Condition: func(request *rest.Request) bool {
-			return request.URL.Path != "/login"
+			return request.URL.Path == "/login"
 		},
 		IfTrue: jwt_middleware,
 	})
 	api_router, _ := rest.MakeRouter(
 		rest.Post("/login", jwt_middleware.LoginHandler),
-		rest.Get("/auth_test", handle_auth),
+		rest.Post("/spu/:oper", service.SpuHandle),
 		rest.Get("/refresh_token", jwt_middleware.RefreshHandler),
 	)
 	api.SetApp(api_router)

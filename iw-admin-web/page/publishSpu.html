@@ -14,6 +14,7 @@
       </div>
 
       <div class="form-group">
+        <label for="spuName">商品名称</label>
         <label>
           <input type="radio" name="skuCatalog" class="minimal" value="1">
           女鞋
@@ -33,12 +34,36 @@
         <textarea id="desc" name="desc" class="form-control" rows="3" placeholder="Enter ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
       </div>
       <div class="form-group">
-        <label for="color">颜色</label>
-        <input id="color" name="color" type="text" class="form-control" placeholder="尺码1&尺码2&尺码3">
+        <label for="color">颜色
+          <div class="btn-group btn-group-xs" role="group" >
+            <button type="button" id="color-add-btn" class="add-item btn btn-default  btn-group-xs" >
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="del-item  btn btn-default  btn-group-xs" >
+              <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+            </button>
+            <div class="template" style="display:none"><input id="color" name="color[<index>]" type="text" class="form-control" placeholder=""></div>
+          </div>
+
+        </label>
+        
+        
       </div>
       <div class="form-group">
-        <label for="size">商品尺码</label>
-        <input id="size" name="size" type="text" class="form-control" placeholder="尺码1&尺码2&尺码3">
+        <label for="size">商品尺码
+         <div class="btn-group btn-group-xs" role="group" >
+            <button type="button" id="size-add-btn" class="add-item btn btn-default  btn-group-xs" >
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="del-item  btn btn-default  btn-group-xs" >
+              <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+            </button>
+              <div  class="template" style="display:none">
+        <input id="size" name="sizeList[<index>].size" type="text" class="form-control">
+        <input id="size" name="sizeList[<index>].available" type="text" class="form-control">
+        </div>
+          </div>
+        </label>
       </div>
       <div class="form-group">
         <label for="price">商品原价</label>
@@ -47,8 +72,6 @@
       <div class="form-group">
         <label for="discount">商品折扣价</label>
         <input id="discount" name="discount" type="text" class="form-control" placeholder="单位:元">
-      </div>
-      <div class="form-group" id="image_box">
       </div>
       <div class="form-group">
         <label for="count">库存数</label>
@@ -61,6 +84,8 @@
 
     </div><!-- /.box-body -->
 
+  </div>
+  <div class="form-group" id="image_box">
   </div>
   <div class="box-footer">
     <button id="submit" class="btn btn-primary">发布</button>
@@ -75,8 +100,57 @@ $('input[type="radio"].minimal').iCheck({
   radioClass: 'iradio_minimal-blue'
 });
 
-$("#submit").click(function(){
-  console.log($("#form").serializeJson())
-})
 $("#image_box").load("page/upload.html")
+
+$(".add-item").click(function(){
+  var template= $(this).nextAll(".template")
+  var node= template.clone(true)
+  node.attr("class",null)
+  var container = $(this).parents(".form-group")
+  var index = container.attr("index")
+  if(!index){
+    index=0
+  }else{
+    index = 1+parseInt(index)
+  }
+  node.children("input").each(function(){
+      $(this).attr("name",$(this).attr("name").replace("<index>",index))
+  })
+  container.append(node)
+  node.show()
+  container.attr("index",index)
+})
+
+$(".del-item").click(function(){
+   var container = $(this).parents(".form-group")
+    var index = parseInt(container.attr("index"))
+    if(index > 0){
+      container.children("div:last-child").remove();
+      container.attr("index", index-1)
+    }
+    
+})
+var xx = '{"color":["hong","dd","dd"]}';
+var data = eval("("+xx+")")
+$(data["color"]).each(function(index){
+    $("#color-add-btn").trigger("click")
+})
+js2form("form",data)
+$("#submit").click(function(){
+  console.log($.toJSON($("#form").toObject()));
+//   $.ajax({
+//       url: "/api/spu/add",
+//       type: "POST",
+//       data:$("#form").serializeJson(),
+//       processData: false,
+//       contentType: "application/json; charset=UTF-8",
+//       complete: function(data){
+//         console.log(data);
+//       },
+//       error:function(){
+//         console.log(data);
+//       }
+//   });  
+})
+
 </script>

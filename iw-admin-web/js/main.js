@@ -1,7 +1,7 @@
 
     var menuList = [
-    {id: "publishSpu",name: "发布鞋子"},
-    {id: "manageSpu",name: "管理鞋子"}
+    {id: "publishSpu",name: "发布商品"},
+    {id: "manageSpu",name: "管理商品"}
     ];
     var MenuList = React.createClass({
       handleMenuClick : function(id){
