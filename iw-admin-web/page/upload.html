@@ -96,11 +96,17 @@ $(function () {
     }).on('fileuploaddone', function (e, data) {
         $.each(data.result.files, function (index, file) {
             if (file.url) {
+                var imageBox = $(data.context.children()[index]).parent()
                 var link = $('<a>')
                     .attr('target', '_blank')
                     .prop('href', file.url);
                 $(data.context.children()[index])
                     .wrap(link);
+                    var size = $("#files").children().length-index-1
+                    imageBox.append("<input type='hidden' name='images["+size+"].image' value="+file.url+">")
+                    imageBox.append("<input type='hidden' name='images["+size+"].deleteUrl' value="+file.deleteUrl+">")
+                    imageBox.append("<button class='btn btn-warn' onclick='deleteImage(\""+file.deleteUrl+"\",this)'>Delete</button>")
+
             } else if (file.error) {
                 var error = $('<span class="text-danger"/>').text(file.error);
                 $(data.context.children()[index])
@@ -118,4 +124,20 @@ $(function () {
     }).prop('disabled', !$.support.fileInput)
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
 });
+
+var deleteImage = function(url, button){
+    $.ajax({
+              url: decodeURIComponent(url),
+              type: "DELETE",
+              dataType:"json",
+              processData: false
+          })
+            .done(function(data){
+                $(button).parent().remove()
+            })
+            .fail(function(jqXHR, textStatus, errorThrown ){
+                console.log(errorThrown);
+            })
+}
+
 </script>

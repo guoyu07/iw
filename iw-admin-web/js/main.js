@@ -1,40 +1,43 @@
+if($.cookie("Name")==null||$.cookie("Token")==null){
+  location.href ="login.html"
+}
 
-    var menuList = [
-    {id: "publishSpu",name: "发布商品"},
-    {id: "manageSpu",name: "管理商品"}
-    ];
-    var MenuList = React.createClass({
-      handleMenuClick : function(id){
-        var targetMenu;
-        $(menuList).each(function(index, element){
-          if(element.id == id){
-            targetMenu = element;
-            element.actived = true;
-          }else{
-            element.actived = false;
-          }
-        })
-        this.setState({data: menuList});
-        PubSub.publish('menuItem', targetMenu);
-      },  
-      getInitialState: function() {
-        return {data: menuList};
-      },  
-      render: function() {
-        var that = this;
-        var menuNodes = this.state.data.map(function(menu) {
-          var activeClassName = menu.actived?"active":"";
-          return (
-            <li key={menu.id} className={activeClassName}><a href="#" onClick={that.handleMenuClick.bind(that, menu.id)}><i className="fa fa-link"></i> <span>{menu.name}</span></a></li>
-            );
-        });
-        return (
-          <ul className="sidebar-menu" >
-            {menuNodes}
-          </ul>                
-          );
+var menuList = [
+{id: "publishSpu",name: "发布商品"},
+{id: "manageSpu",name: "管理商品"}
+];
+var MenuList = React.createClass({
+  handleMenuClick : function(id){
+    var targetMenu;
+    $(menuList).each(function(index, element){
+      if(element.id == id){
+        targetMenu = element;
+        element.actived = true;
+      }else{
+        element.actived = false;
       }
+    })
+    this.setState({data: menuList});
+    PubSub.publish('menuItem', targetMenu);
+  },  
+  getInitialState: function() {
+    return {data: menuList};
+  },  
+  render: function() {
+    var that = this;
+    var menuNodes = this.state.data.map(function(menu) {
+      var activeClassName = menu.actived?"active":"";
+      return (
+        <li key={menu.id} className={activeClassName}><a href="#" onClick={that.handleMenuClick.bind(that, menu.id)}><i className="fa fa-link"></i> <span>{menu.name}</span></a></li>
+        );
     });
+    return (
+      <ul className="sidebar-menu" >
+      {menuNodes}
+      </ul>                
+      );
+  }
+});
 
 ReactDOM.render(
   <MenuList/>,
@@ -57,11 +60,11 @@ var ContentHeader = React.createClass({
     }
     return (
       <section className="content-header">
-        <h1>
-          {this.state.data.name}
-          <small>Optional description</small>
-        </h1>
-        {breadCrumb}
+      <h1>
+      {this.state.data.name}
+      <small>Optional description</small>
+      </h1>
+      {breadCrumb}
       </section>                             
       );
   }
@@ -74,5 +77,26 @@ ReactDOM.render(
 
 
 PubSub.subscribe('menuItem', function(topic, menuItem) {
-  $("#content").load("page/"+menuItem.id+".html")
+  var url = "page/"+menuItem.id+".html"
+  if(menuItem["paramId"]){
+    url+="?id="+menuItem["paramId"]
+  }
+  $.ajax({
+    url: url
+  }).done(function(html) {
+    $('#content')
+    .trigger({type: 'content-will-change'})
+    .html(html);
+  })
 })
+
+var target = getParameterByName("target")
+
+if(target){
+  $(menuList).each(function(index, obj){
+    if(obj.id == target){
+      obj.paramId = getParameterByName("id")
+      PubSub.publish('menuItem', obj);
+    }
+  })
+}

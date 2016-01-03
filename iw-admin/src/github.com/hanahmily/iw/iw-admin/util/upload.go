@@ -213,12 +213,14 @@ func post(w http.ResponseWriter, r *http.Request) {
 }
 
 func delete(w http.ResponseWriter, r *http.Request) {
-	key := extractKey(r)
+	params, err := url.ParseQuery(r.URL.RawQuery)
+	log.Println(params)
+	key := params["id"][0]
 	if key == "" {
 		http.Error(w, "405 Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	err := os.RemoveAll(IMAGE_DIRECTORY + key)
+	err = os.RemoveAll(IMAGE_DIRECTORY + key)
 	result := make(map[string]bool, 1)
 	result[key] = true
 	w.Header().Set("Content-Type", "application/json")
@@ -229,6 +231,7 @@ func delete(w http.ResponseWriter, r *http.Request) {
 
 func UploadHandle(w http.ResponseWriter, r *http.Request) {
 	params, err := url.ParseQuery(r.URL.RawQuery)
+	url.Parse("x")
 	check(err)
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.Header().Add(

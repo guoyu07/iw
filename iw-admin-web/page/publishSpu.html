@@ -4,6 +4,10 @@
   <!-- form start -->
   <div role="form" id="form">
     <div class="box-body">
+      <label for="image_box">商品图片</label>
+      <div class="form-group" id="image_box">
+
+      </div>
       <div class="form-group">
         <label for="spuId">商品编码</label>
         <input id="spuId" name="spuId" type="text" class="form-control" placeholder="Enter ...">
@@ -12,23 +16,6 @@
         <label for="spuName">商品名称</label>
         <input id="spuName" name="name" type="text" class="form-control" placeholder="Enter ...">
       </div>
-
-      <div class="form-group">
-        <label for="spuName">商品名称</label>
-        <label>
-          <input type="radio" name="skuCatalog" class="minimal" value="1">
-          女鞋
-        </label>
-        <label>
-          <input type="radio" name="skuCatalog" class="minimal"  value="2">
-          服饰
-        </label>
-        <label>
-          <input type="radio" name="skuCatalog" class="minimal"  value="3">
-          男鞋
-        </label>
-      </div>
-
       <div class="form-group">
         <label for="desc">商品描述</label>
         <textarea id="desc" name="desc" class="form-control" rows="3" placeholder="Enter ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
@@ -42,55 +29,62 @@
             <button type="button" class="del-item  btn btn-default  btn-group-xs" >
               <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
             </button>
-            <div class="template" style="display:none"><input id="color" name="color[<index>]" type="text" class="form-control" placeholder=""></div>
+            
           </div>
-
         </label>
-        
-        
       </div>
       <div class="form-group">
         <label for="size">商品尺码
          <div class="btn-group btn-group-xs" role="group" >
-            <button type="button" id="size-add-btn" class="add-item btn btn-default  btn-group-xs" >
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-            </button>
-            <button type="button" class="del-item  btn btn-default  btn-group-xs" >
-              <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-            </button>
-              <div  class="template" style="display:none">
-        <input id="size" name="sizeList[<index>].size" type="text" class="form-control">
-        <input id="size" name="sizeList[<index>].available" type="text" class="form-control">
+          <button type="button" id="size-add-btn" class="add-item btn btn-default  btn-group-xs" >
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="del-item  btn btn-default  btn-group-xs" >
+            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+          </button>
+          
         </div>
+      </label>
+    </div>
+    <div class="form-group">
+      <label for="price">商品原价</label>
+      <input id="price" name="price" type="text" class="form-control" placeholder="单位:元">
+    </div>
+    <div class="form-group">
+      <label for="discount">商品折扣价</label>
+      <input id="discount" name="discount" type="text" class="form-control" placeholder="单位:元">
+    </div>
+    <div class="form-group">
+      <label for="count">库存数</label>
+      <input id="count" name="count" type="text" class="form-control" placeholder="单位:元">
+    </div>
+    <div class="form-group">
+      <label for="comment">备注</label>
+      <textarea id="comment" name="remark" class="form-control" rows="3" placeholder="Enter ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
+    </div>
+
+  </div><!-- /.box-body -->
+
+</div>
+
+<div class="box-footer">
+  <button id="submit" class="btn btn-primary">发布</button>
+</div>
+<div id="color-add-btn-template" style="display:none"><input id="color" name="color[<index>]" type="text" class="form-control" placeholder=""></div>
+<div id="size-add-btn-template" class="row" style="display:none">
+  
+  <div class="col-xs-8"><input id="size" name="sizeList[<index>].size" type="text" class="form-control"></div>
+  <div class="col-xs-4">
+    
+    <span>有货</span>
+            <input id="size" name="sizeList[<index>].available" value="true" type="radio" class="minimal" checked>
+            <span>无货</span>
+            <input id="size" name="sizeList[<index>].available" value="false" type="radio" class="minimal">
+  </div>
+</div>
+            
+            
           </div>
-        </label>
-      </div>
-      <div class="form-group">
-        <label for="price">商品原价</label>
-        <input id="price" name="price" type="text" class="form-control" placeholder="单位:元">
-      </div>
-      <div class="form-group">
-        <label for="discount">商品折扣价</label>
-        <input id="discount" name="discount" type="text" class="form-control" placeholder="单位:元">
-      </div>
-      <div class="form-group">
-        <label for="count">库存数</label>
-        <input id="count" type="text" class="form-control" placeholder="单位:元">
-      </div>
-      <div class="form-group">
-        <label for="comment">备注</label>
-        <textarea id="comment" class="form-control" rows="3" placeholder="Enter ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
-      </div>
-
-    </div><!-- /.box-body -->
-
-  </div>
-  <div class="form-group" id="image_box">
-  </div>
-  <div class="box-footer">
-    <button id="submit" class="btn btn-primary">发布</button>
-  </div>
-
 </div>
 <script src="plugins/iCheck/icheck.min.js"></script>
 <script type="text/javascript">
@@ -100,12 +94,10 @@ $('input[type="radio"].minimal').iCheck({
   radioClass: 'iradio_minimal-blue'
 });
 
-$("#image_box").load("page/upload.html")
-
 $(".add-item").click(function(){
-  var template= $(this).nextAll(".template")
+  var template= $("#"+$(this).attr("id")+"-template")
   var node= template.clone(true)
-  node.attr("class",null)
+  node.attr("id",null)
   var container = $(this).parents(".form-group")
   var index = container.attr("index")
   if(!index){
@@ -113,44 +105,78 @@ $(".add-item").click(function(){
   }else{
     index = 1+parseInt(index)
   }
-  node.children("input").each(function(){
-      $(this).attr("name",$(this).attr("name").replace("<index>",index))
+  node.find("input").each(function(){
+    $(this).attr("name",$(this).attr("name").replace("<index>",index))
   })
   container.append(node)
   node.show()
   container.attr("index",index)
+  $('input[type="radio"].minimal').iCheck({
+    radioClass: 'iradio_minimal-blue'
+  });
 })
 
 $(".del-item").click(function(){
-   var container = $(this).parents(".form-group")
-    var index = parseInt(container.attr("index"))
-    if(index > 0){
-      container.children("div:last-child").remove();
-      container.attr("index", index-1)
-    }
-    
+ var container = $(this).parents(".form-group")
+ var index = parseInt(container.attr("index"))
+ if(index > 0){
+  container.children("div:last-child").remove();
+  container.attr("index", index-1)
+}
+
 })
-var xx = '{"color":["hong","dd","dd"]}';
-var data = eval("("+xx+")")
-$(data["color"]).each(function(index){
-    $("#color-add-btn").trigger("click")
-})
-js2form("form",data)
 $("#submit").click(function(){
-  console.log($.toJSON($("#form").toObject()));
-//   $.ajax({
-//       url: "/api/spu/add",
-//       type: "POST",
-//       data:$("#form").serializeJson(),
-//       processData: false,
-//       contentType: "application/json; charset=UTF-8",
-//       complete: function(data){
-//         console.log(data);
-//       },
-//       error:function(){
-//         console.log(data);
-//       }
-//   });  
+  var params = $("#form").toObject()
+  var url = "/api/spu"
+  if(params["_id"]){
+    url+="/update"
+  }else{
+    url+="/add"
+  }
+  post(url,$("#form").toObject(),function(data){
+    alert("添加商品成功")
+  });
 })
+
+
+var id = getParameterByName("id")
+if(id){
+  post("/api/spu/findOne",{_id:id},function(data){
+    $(".add-item").each(function(){
+      var id = $(this).attr("id")
+      var dataNode = id.substring(0,id.indexOf("-"))
+      var button = $(this)
+      if(data[dataNode]){
+        $(data[dataNode]).each(function(){
+          button.trigger("click")
+        })
+      }else{
+        button.trigger("click")
+      }
+
+    })
+
+    $("#image_box").load("page/upload.html",null,function(){
+      $(data["images"]).each(function(index,obj){
+        $("#files").append("<div><a target=\"_blank\" href=\""+obj.image+"\"><p><image width=\"100\" height=\"100\" src=\""+obj.image+"\"><br></p></a><input type=\"hidden\" name=\"images["+index+"].image\" value=\""+obj.image+"\"><input type=\"hidden\" name=\"images["+index+"].deleteUrl\" value=\""+obj.deleteUrl+"\"><button class=\"btn btn-warn\" onclick=\"deleteImage(&quot;"+obj.deleteUrl+"&quot;,this)\">Delete</button></div>")
+      })
+    })
+
+    js2form("form",data)
+    $("#form").append("<input type='hidden' name='_id' value='"+id+"'/>")
+    $("#submit").text("更新")
+  })
+}else{
+  $("#image_box").load("page/upload.html")
+  $(".add-item").each(function(){
+      var id = $(this).attr("id")
+      var dataNode = id.substring(0,id.indexOf("-"))
+      var button = $(this)
+      button.trigger("click")
+    })
+}
+
+
+
 
 </script>

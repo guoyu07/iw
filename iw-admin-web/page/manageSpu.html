@@ -1,0 +1,24 @@
+<div id="manageSpuBox" class="box box-primary">
+<table class="table">
+<thead><tr>
+                      <th style="width: 10px">#</th>
+                      <th>名称</th>
+                    <th style="width: 100px">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                  </tbody></table>
+</div>
+
+<script type="text/javascript">
+	
+	post("/api/spu/find",{"query":{"saleState":"on"},"sort":"onSaleDate=1"},function(data){
+		$(data).each(function(index, obj){
+			$("tbody").append("<tr><td>"+(parseInt(index)+1)+"</td><td>"+obj.name+"</td><td><a href=\"#\" target=\"_blank\" onclick='edit(\""+obj["_id"]+"\")''>修改</a></td></tr>")
+		})
+	})
+
+	edit = function(id){
+		window.open("//iwshoes.cn/admin/main.html?target=publishSpu&id="+id)
+	}
+</script>
