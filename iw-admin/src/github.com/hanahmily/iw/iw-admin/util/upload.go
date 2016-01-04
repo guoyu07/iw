@@ -131,7 +131,7 @@ func handleUpload(r *http.Request, p *multipart.Part) (fi *FileInfo) {
 	filePath := IMAGE_DIRECTORY + fi.Key
 	err = os.MkdirAll(filePath, 0777)
 	check(err)
-	f, err := os.OpenFile(filePath+escape(string(fi.Name)), os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(filePath+fi.Name, os.O_WRONLY|os.O_CREATE, 0666)
 	check(err)
 	defer f.Close()
 	io.Copy(f, &buffer)

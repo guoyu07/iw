@@ -15,7 +15,7 @@ func handle_auth(w rest.ResponseWriter, r *rest.Request) {
 
 func main() {
 	api := rest.NewApi()
-	api.Use(rest.DefaultDevStack...)
+	api.Use(rest.DefaultProdStack...)
 	// we use the IfMiddleware to remove certain paths from needing authentication
 	jwtMiddleWare := service.AuthMiddleware()
 	api.Use(&rest.IfMiddleware{
@@ -36,5 +36,5 @@ func main() {
 	// http.HandleFunc("/upload", upload)
 	http.HandleFunc("/upload", util.UploadHandle)
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":9080", nil))
 }
