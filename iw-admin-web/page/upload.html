@@ -102,9 +102,15 @@ $(function () {
                     .prop('href', file.url);
                 $(data.context.children()[index])
                     .wrap(link);
-                    var size = $("#files").children().length-index-1
-                    imageBox.append("<input type='hidden' name='images["+size+"].image' value="+file.url+">")
-                    imageBox.append("<input type='hidden' name='images["+size+"].deleteUrl' value="+file.deleteUrl+">")
+                    var index = $("#files").attr("index")
+                    if(!index||index<0){
+                        index=0
+                      }else{
+                        index = 1+parseInt(index)
+                      }
+                      $("#files").attr("index",index)
+                    imageBox.append("<input type='hidden' name='images["+index+"].image' value="+file.url+">")
+                    imageBox.append("<input type='hidden' name='images["+index+"].deleteUrl' value="+file.deleteUrl+">")
                     imageBox.append("<button class='btn btn-warn' onclick='deleteImage(\""+file.deleteUrl+"\",this)'>Delete</button>")
 
             } else if (file.error) {
@@ -134,6 +140,9 @@ var deleteImage = function(url, button){
           })
             .done(function(data){
                 $(button).parent().remove()
+                var index = $("#files").attr("index")
+                index = parseInt(index) - 1
+                $("#files").attr("index", index)
             })
             .fail(function(jqXHR, textStatus, errorThrown ){
                 console.log(errorThrown);

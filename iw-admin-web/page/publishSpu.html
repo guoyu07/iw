@@ -1,5 +1,9 @@
 <link rel="stylesheet" href="plugins/iCheck/all.css">
-
+<div class="alert alert-warning alert-dismissable" style="display:none">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-warning"></i> Alert!</h4>
+                    
+                  </div>
 <div class="box box-primary">
   <!-- form start -->
   <div role="form" id="form">
@@ -10,15 +14,15 @@
       </div>
       <div class="form-group">
         <label for="spuId">商品编码</label>
-        <input id="spuId" name="spuId" type="text" class="form-control" placeholder="Enter ...">
+        <input id="spuId" name="spuId" type="text" class="form-control not-null" placeholder="输入 ...">
       </div>
       <div class="form-group">
         <label for="spuName">商品名称</label>
-        <input id="spuName" name="name" type="text" class="form-control" placeholder="Enter ...">
+        <input id="spuName" name="name" type="text" class="form-control not-null" placeholder="输入 ...">
       </div>
       <div class="form-group">
         <label for="desc">商品描述</label>
-        <textarea id="desc" name="desc" class="form-control" rows="3" placeholder="Enter ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
+        <textarea id="desc" name="desc" class="form-control" rows="3" placeholder="输入 ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
       </div>
       <div class="form-group">
         <label for="color">颜色
@@ -48,15 +52,15 @@
     </div>
     <div class="form-group">
       <label for="price">商品原价</label>
-      <input id="price" name="price" type="text" class="form-control" placeholder="单位:元">
+      <input id="price" name="price" type="text" class="form-control not-null" placeholder="单位:元">
     </div>
     <div class="form-group">
       <label for="discount">商品折扣价</label>
-      <input id="discount" name="discount" type="text" class="form-control" placeholder="单位:元">
+      <input id="discount" name="discount" type="text" class="form-control not-null" placeholder="单位:元">
     </div>
     <div class="form-group">
       <label for="count">库存数</label>
-      <input id="count" name="count" type="text" class="form-control" placeholder="单位:元">
+      <input id="count" name="count" type="text" class="form-control  not-null" placeholder="">
     </div>
     <div class="form-group">
       <label for="comment">备注</label>
@@ -73,7 +77,7 @@
 <div id="color-add-btn-template" style="display:none"><input id="color" name="color[<index>]" type="text" class="form-control" placeholder=""></div>
 <div id="size-add-btn-template" class="row" style="display:none">
   
-  <div class="col-xs-8"><input id="size" name="sizeList[<index>].size" type="text" class="form-control"></div>
+  <div class="col-xs-8"><input id="size" name="sizeList[<index>].size" type="text" class="form-control  not-null"></div>
   <div class="col-xs-4">
     
     <span>有货</span>
@@ -125,7 +129,40 @@ $(".del-item").click(function(){
 }
 
 })
+
+validate = function(){
+  if($("#files").find("input").length<1){
+    alert("请上传图片")
+    
+    window.scroll(0 ,$("#files").offset().top-120)
+    return false
+  }
+
+  var validateSuccess = true
+  var offsetTop
+  $("#form").find(".not-null").each(function(index, obj){
+    var container = $(obj).parents(".form-group")
+    if(container.hasClass("has-error")){
+      container.removeClass("has-error")
+    }
+    if(!$(obj).val()){
+      validateSuccess = false;
+      if(!offsetTop){
+        offsetTop = $(obj).offset().top-25
+      }
+      container.addClass("has-error")
+    }
+  })
+  if(!validateSuccess){
+    console.log(offsetTop)
+    window.scroll(0 ,offsetTop)
+  }
+  return validateSuccess
+}
 $("#submit").click(function(){
+  if(!validate()){
+    return
+  }
   var params = $("#form").toObject()
   var url = "/api/spu"
   if(params["_id"]){
@@ -157,9 +194,12 @@ if(id){
     })
 
     $("#image_box").load("page/upload.html",null,function(){
+      var index = -1;
       $(data["images"]).each(function(index,obj){
         $("#files").append("<div><a target=\"_blank\" href=\""+obj.image+"\"><p><image width=\"100\" height=\"100\" src=\""+obj.image+"\"><br></p></a><input type=\"hidden\" name=\"images["+index+"].image\" value=\""+obj.image+"\"><input type=\"hidden\" name=\"images["+index+"].deleteUrl\" value=\""+obj.deleteUrl+"\"><button class=\"btn btn-warn\" onclick=\"deleteImage(&quot;"+obj.deleteUrl+"&quot;,this)\">Delete</button></div>")
+        index += 1
       })
+      $("#files").attr("index",index)
     })
 
     js2form("form",data)
