@@ -21,12 +21,6 @@ func add(session *mgo.Session, spuInfo map[string]interface{}) error {
 	spuInfo["saleState"] = "on"
 	spuInfo["onSaleDate"] = bson.Now()
 	err := c.Insert(&spuInfo)
-	if err != nil {
-		return err
-	}
-	c = session.DB("product").C("list")
-	makeListItem(spuInfo)
-	err = c.Insert(spuInfo)
 	return err
 }
 
@@ -36,12 +30,6 @@ func update(session *mgo.Session, spuInfo map[string]interface{}) error {
 	c := session.DB("product").C("items")
 	selector := bson.M{"_id": objectId}
 	err := c.Update(selector, bson.M{"$set": spuInfo, "$currentDate": bson.M{"lastModified": true}})
-	if err != nil {
-		return err
-	}
-	makeListItem(spuInfo)
-	c = session.DB("product").C("list")
-	err = c.Update(selector, bson.M{"$set": spuInfo, "$currentDate": bson.M{"lastModified": true}})
 	return err
 }
 
@@ -53,33 +41,20 @@ func toggleOnSale(session *mgo.Session, spuInfo map[string]interface{}) error {
 	productDB := session.DB("product")
 	itemsCol := productDB.C("items")
 	item := make(map[string]interface{})
-	err := itemsCol.FindId(objectId).One(item)
+	err := itemsCol.FindId(objectId).One(&item)
 	if err != nil {
 		return err
 	}
-
-	listCol := productDB.C("list")
-	var existedItemSize int = 0
-	existedItemSize, _ = listCol.FindId(objectId).Count()
-	if existedItemSize > 0 {
+	if item["saleState"] == "on" {
 		//off sale
 		item["offSaleDate"] = bson.Now()
 		item["saleState"] = "off"
-		err := itemsCol.UpdateId(objectId, item)
-		if err != nil {
-			return err
-		}
-		return listCol.RemoveId(objectId)
+		return itemsCol.UpdateId(objectId, item)
 	} else {
 		//on sale
 		item["onSaleDate"] = bson.Now()
 		item["saleState"] = "on"
-		err := itemsCol.UpdateId(objectId, item)
-		if err != nil {
-			return err
-		}
-		makeListItem(item)
-		return listCol.Insert(item)
+		return itemsCol.UpdateId(objectId, item)
 	}
 }
 
@@ -107,13 +82,6 @@ func findOne(session *mgo.Session, query map[string]interface{}) (result map[str
 	c := session.DB("product").C("items")
 	err = c.FindId(bson.ObjectIdHex(objectId)).One(&result)
 	return result, err
-}
-
-func makeListItem(spuInfo map[string]interface{}) map[string]interface{} {
-	delete(spuInfo, "sizeList")
-	delete(spuInfo, "itemStyle")
-	delete(spuInfo, "desc")
-	return spuInfo
 }
 
 func SpuHandle(w rest.ResponseWriter, r *rest.Request) {
