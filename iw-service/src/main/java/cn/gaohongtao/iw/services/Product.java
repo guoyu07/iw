@@ -59,17 +59,18 @@ public class Product {
         if (!Strings.isNullOrEmpty(request.getLastSymbol()))
             conditionFilters.add(lt("onsale_date", format.parse(request.getLastSymbol())));
 
+        conditionFilters.add(eq("strategy" ,request.getStrategy()));
         Bson filter;
         if(conditionFilters.size()>0){
             filter = and(conditionFilters);
         }else{
             filter = new BsonDocument();
         }
-        MongoCollection<Document> collection = MongoUtil.getDatabase("product").getCollection("list_" + request.getStrategy());
+        MongoCollection<Document> collection = MongoUtil.getDatabase("product").getCollection("items");
 
         List<Document> result = new ArrayList<>();
         for (Document item : collection.find(filter)
-                .projection(and(eq("size", 0), eq("colour", 0), eq("type", 0), eq("heel_height", 0)))
+                .projection(and(eq("name", 1), eq("price", 1), eq("discount", 1), eq("sales", 1), eq("images", 1)))
                 .sort(eq("onsale_date", -1)).limit(request.getPageSize())) {
             item.append("id", item.getString("_id"));
             item.remove("_id");
