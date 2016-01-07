@@ -15,7 +15,15 @@ func handle_auth(w rest.ResponseWriter, r *rest.Request) {
 
 func main() {
 	api := rest.NewApi()
-	api.Use(rest.DefaultProdStack...)
+	var prodStack = []rest.Middleware{
+		&rest.TimerMiddleware{},
+		&rest.RecorderMiddleware{},
+		&rest.PoweredByMiddleware{},
+		&rest.RecoverMiddleware{},
+		&rest.GzipMiddleware{},
+		&rest.ContentTypeCheckerMiddleware{},
+	}
+	api.Use(prodStack...)
 	// we use the IfMiddleware to remove certain paths from needing authentication
 	jwtMiddleWare := service.AuthMiddleware()
 	api.Use(&rest.IfMiddleware{

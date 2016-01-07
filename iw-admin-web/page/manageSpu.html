@@ -1,24 +1,72 @@
 <div id="manageSpuBox" class="box box-primary">
-<table class="table">
-<thead><tr>
-                      <th style="width: 10px">#</th>
-                      <th>名称</th>
-                    <th style="width: 100px">操作</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                  </tbody></table>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>商品</th>
+                <th style="width: 100px">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 </div>
-
 <script type="text/javascript">
-	
-	post("/api/spu/find",{"query":{"saleState":"on"},"sort":"onSaleDate=1"},function(data){
-		$(data).each(function(index, obj){
-			$("tbody").append("<tr><td>"+(parseInt(index)+1)+"</td><td>"+obj.name+"</td><td><a href=\"#\" target=\"_blank\" onclick='edit(\""+obj["_id"]+"\")''>修改</a></td></tr>")
-		})
-	})
+var loadPage = function() {
+    post("/api/spu/find", {
+        "query": {
+            // "saleState": "on"
+        },
+        "sort": "-onSaleDate"
+    }, function(data) {
+        var button = $('<button/>')
+            .addClass('btn btn-link')
+        var tbody = $("tbody")
+        tbody.html("")
+        $(data).each(function(index, obj) {
+            var imageUrl = ""
+            if (obj["images"] && obj["images"].length > 0) {
+                imageUrl = obj.images[0].image
+            }
+            var showCol = $("<td>").append("<div class=\"container-fluid\"><div class = \"row\">  <div class = \"col-md-3\"> <image width=\"100\" height=\"100\" src=\"" + imageUrl + "\"></div>   <div class = \"col-md-9\"> <div class = \"row\">  <div class = \"col-md-2\"> <p class=\"text-muted\">" + obj.spuId + "</p></div>  <div class = \"col-md-4\">" + obj.name + "</div><div class = \"col-md-2\">" + dataMap.saleState[obj.saleState] + "</div> </div>  </div></div> </div>")
+            var editBtn = button.clone(true)
+            editBtn.text("修改").click({
+                id: obj["_id"]
+            }, function(event) {
+                var store = window.localStorage
+                store.removeItem("target")
+                store.setItem("target", "{id:'publishSpu',name:'修改商品'}")
+                store.removeItem("param")
+                store.setItem("param", event.data.id)
+                window.open("main.html")
+            })
+            var toggleBtn = button.clone(true)
+            if (obj["saleState"] == "on") {
+                toggleBtn.text("下架")
+            } else {
+                toggleBtn.text("上架")
+            }
+            toggleBtn.click({
+                id: obj["_id"]
+            }, function(event) {
+                post("/api/spu/toggleOnSale", {
+                    "_id": event.data.id
+                }, function(data) {
+                    loadPage()
+                })
+            })
+            var operateCol = $("<td>").append(editBtn).append(toggleBtn)
+            var col = $("<tr>").append(showCol).append(operateCol)
+            tbody.append(col)
+        })
+    })
+}
 
-	edit = function(id){
-		window.open("//iwshoes.cn/admin/main.html?target=publishSpu&id="+id)
-	}
+
+var toggleFunc = function() {
+    post("/api/spu/find", {
+        "_id": id
+    }, function(data) {})
+}
+
+loadPage()
 </script>

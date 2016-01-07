@@ -78,9 +78,6 @@ ReactDOM.render(
 
 PubSub.subscribe('menuItem', function(topic, menuItem) {
   var url = "page/"+menuItem.id+".html"
-  if(menuItem["paramId"]){
-    url+="?id="+menuItem["paramId"]
-  }
   $.ajax({
     url: url
   }).done(function(html) {
@@ -90,13 +87,11 @@ PubSub.subscribe('menuItem', function(topic, menuItem) {
   })
 })
 
-var target = getParameterByName("target")
-
-if(target){
-  $(menuList).each(function(index, obj){
-    if(obj.id == target){
-      obj.paramId = getParameterByName("id")
-      PubSub.publish('menuItem', obj);
+    var store = window.localStorage
+    var dataStr = store.getItem("target");
+    if(dataStr){
+      store.removeItem("target")
+      var target = eval("("+dataStr+")")
+      PubSub.publish('menuItem', target);
     }
-  })
-}
+    

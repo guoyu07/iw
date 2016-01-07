@@ -6,7 +6,6 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 	"net/http"
 )
 
@@ -38,23 +37,16 @@ func toggleOnSale(session *mgo.Session, spuInfo map[string]interface{}) error {
 	if !ok {
 		return NotFoundFieldError
 	}
-	productDB := session.DB("product")
-	itemsCol := productDB.C("items")
-	item := make(map[string]interface{})
-	err := itemsCol.FindId(objectId).One(&item)
+	item, err := findOne(session, spuInfo)
 	if err != nil {
 		return err
 	}
 	if item["saleState"] == "on" {
 		//off sale
-		item["offSaleDate"] = bson.Now()
-		item["saleState"] = "off"
-		return itemsCol.UpdateId(objectId, item)
+		return update(session, bson.M{"_id": objectId, "saleState": "off", "offSaleDate": bson.Now()})
 	} else {
 		//on sale
-		item["onSaleDate"] = bson.Now()
-		item["saleState"] = "on"
-		return itemsCol.UpdateId(objectId, item)
+		return update(session, bson.M{"_id": objectId, "saleState": "on", "onSaleDate": bson.Now()})
 	}
 }
 
@@ -78,7 +70,6 @@ func findOne(session *mgo.Session, query map[string]interface{}) (result map[str
 	if !ok {
 		return nil, NotFoundFieldError
 	}
-	log.Println(query)
 	c := session.DB("product").C("items")
 	err = c.FindId(bson.ObjectIdHex(objectId)).One(&result)
 	return result, err

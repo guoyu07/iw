@@ -1,222 +1,313 @@
 <link rel="stylesheet" href="plugins/iCheck/all.css">
 <div class="alert alert-warning alert-dismissable" style="display:none">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h4><i class="icon fa fa-warning"></i> Alert!</h4>
-                    
-                  </div>
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <h4><i class="icon fa fa-warning"></i> Alert!</h4>
+</div>
 <div class="box box-primary">
-  <!-- form start -->
-  <div role="form" id="form">
-    <div class="box-body">
-      <label for="image_box">商品图片</label>
-      <div class="form-group" id="image_box">
-
-      </div>
-      <div class="form-group">
-        <label for="spuId">商品编码</label>
-        <input id="spuId" name="spuId" type="text" class="form-control not-null" placeholder="输入 ...">
-      </div>
-      <div class="form-group">
-        <label for="spuName">商品名称</label>
-        <input id="spuName" name="name" type="text" class="form-control not-null" placeholder="输入 ...">
-      </div>
-      <div class="form-group">
-        <label for="desc">商品描述</label>
-        <textarea id="desc" name="desc" class="form-control" rows="3" placeholder="输入 ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="color">颜色
-          <div class="btn-group btn-group-xs" role="group" >
-            <button type="button" id="color-add-btn" class="add-item btn btn-default  btn-group-xs" >
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-            </button>
-            <button type="button" class="del-item  btn btn-default  btn-group-xs" >
-              <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-            </button>
-            
-          </div>
-        </label>
-      </div>
-      <div class="form-group">
-        <label for="size">商品尺码
-         <div class="btn-group btn-group-xs" role="group" >
-          <button type="button" id="sizeList-add-btn" class="add-item btn btn-default  btn-group-xs" >
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-          </button>
-          <button type="button" class="del-item  btn btn-default  btn-group-xs" >
-            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
-          </button>
-          
+    <!-- form start -->
+    <div role="form" id="form">
+        <div class="box-body">
+            <label for="image_box">商品图片</label>
+            <div class="form-group" id="image_box">
+            </div>
+            <div class="form-group">
+                <label for="spuId">商品编码</label>
+                <input id="spuId" name="spuId" type="text" class="form-control not-null" placeholder="输入 ...">
+            </div>
+            <div class="form-group">
+                <label for="spuName">商品名称</label>
+                <input id="spuName" name="name" type="text" class="form-control not-null" placeholder="输入 ...">
+            </div>
+            <div class="form-group">
+                <label for="desc">商品描述</label>
+                <textarea id="desc" name="desc" class="form-control" rows="3" placeholder="输入 ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="spuId">商品分类</label>
+                <div class="radio">
+                    <label>
+                        <input name="strategy" value="ladies_shoes" checked="" type="radio"> 女鞋
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input name="strategy" value="men_shoes" type="radio"> 男鞋
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input name="strategy" value="clother" type="radio"> 衣服
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="color">颜色
+                </label>
+                <select class="form-control" name="color[0]">
+                    <option>黑</option>
+                    <option>白</option>
+                    <option>灰</option>
+                    <option>棕</option>
+                    <option>裸</option>
+                    <option>红</option>
+                    <option>绿</option>
+                    <option>蓝</option>
+                    <option>紫</option>
+                    <option>粉</option>
+                    <option>黄</option>
+                    <option>银</option>
+                    <option>金</option>
+                    <option>豹纹</option>
+                    <option>斑马纹</option>
+                    <option>印花</option>
+                    <option>蕾丝</option>
+                    <option>其它</option>
+                </select>
+            </div>
+            <div class="form-group shoes-class">
+                <label for="style">鞋型
+                </label>
+                <select class="form-control" name="style">
+                    <option>凉鞋</option>
+                    <option>平底</option>
+                    <option>跟鞋</option>
+                    <option>短靴</option>
+                    <option>长靴</option>
+                    <option>运动鞋</option>
+                    <option>其它</option>
+                </select>
+            </div>
+            <div class="form-group shoes-class">
+                <label for="heel_height">跟高
+                </label>
+                <select class="form-control" name="heel_height[0]">
+                    <option>0cm</option>
+                    <option>3-5cm</option>
+                    <option>5cm</option>
+                    <option>6-7cm</option>
+                    <option>8以上</option>
+                </select>
+            </div>
+            <div class="form-group" id="sizeList-div">
+                <label for="size">商品尺码
+                    <div class="btn-group btn-group-xs" role="group">
+                        <button type="button" id="sizeList-add-btn" class="add-item btn btn-default  btn-group-xs">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        </button>
+                        <button type="button" class="del-item  btn btn-default  btn-group-xs">
+                            <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="price">商品原价</label>
+                <input id="price" name="price" type="text" class="form-control not-null" placeholder="单位:元">
+            </div>
+            <div class="form-group">
+                <label for="discount">商品折扣价</label>
+                <input id="discount" name="discount" type="text" class="form-control not-null" placeholder="单位:元">
+            </div>
+            <div class="form-group">
+                <label for="comment">备注</label>
+                <textarea id="comment" name="remark" class="form-control" rows="3" placeholder="Enter ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
+            </div>
         </div>
-      </label>
+        <!-- /.box-body -->
     </div>
-    <div class="form-group">
-      <label for="price">商品原价</label>
-      <input id="price" name="price" type="text" class="form-control not-null" placeholder="单位:元">
+    <div class="box-footer">
+        <button id="submit" class="btn btn-primary">发布</button>
     </div>
-    <div class="form-group">
-      <label for="discount">商品折扣价</label>
-      <input id="discount" name="discount" type="text" class="form-control not-null" placeholder="单位:元">
+    <div id="sizeList-add-btn-ladies_shoes-template" class="row" style="display:none">
+        <div class="col-xs-4">
+            <select class="form-control" name="sizeList[<index>].size">
+                <option>34</option>
+                <option>35</option>
+                <option>36</option>
+                <option>37</option>
+                <option>38</option>
+                <option>39</option>
+                <option>40</option>
+            </select>
+        </div>
+        <div class="input-group  col-xs-4">
+            <input id="size" name="sizeList[<index>].count" type="text" class="form-control  not-null" placeholder="库存">
+            <div class="input-group-addon">双</div>
+        </div>
     </div>
-    <div class="form-group">
-      <label for="count">库存数</label>
-      <input id="count" name="count" type="text" class="form-control  not-null" placeholder="">
+    <div id="sizeList-add-btn-men_shoes-template" class="row" style="display:none">
+        <div class="col-xs-4">
+            <select class="form-control" name="sizeList[<index>].size">
+                <option>37</option>
+                <option>38</option>
+                <option>39</option>
+                <option>40</option>
+                <option>41</option>
+                <option>42</option>
+                <option>43</option>
+                <option>44</option>
+            </select>
+        </div>
+        <div class="input-group  col-xs-4">
+            <input id="size" name="sizeList[<index>].count" type="text" class="form-control  not-null" placeholder="库存">
+            <div class="input-group-addon">双</div>
+        </div>
     </div>
-    <div class="form-group">
-      <label for="comment">备注</label>
-      <textarea id="comment" name="remark" class="form-control" rows="3" placeholder="Enter ..." style="margin: 0px -1px 0px 0px; width: 467px; height: 74px;"></textarea>
+    <div id="sizeList-add-btn-clother-template" class="row" style="display:none">
+        <div class="col-xs-4">
+            <select class="form-control" name="sizeList[<index>].size">
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+            </select>
+        </div>
+        <div class="input-group  col-xs-4">
+            <input id="size" name="sizeList[<index>].count" type="text" class="form-control  not-null" placeholder="库存">
+            <div class="input-group-addon">件</div>
+        </div>
     </div>
-
-  </div><!-- /.box-body -->
-
 </div>
-
-<div class="box-footer">
-  <button id="submit" class="btn btn-primary">发布</button>
 </div>
-<div id="color-add-btn-template" style="display:none"><input id="color" name="color[<index>]" type="text" class="form-control" placeholder=""></div>
-<div id="sizeList-add-btn-template" class="row" style="display:none">
-  
-  <div class="col-xs-8"><input id="size" name="sizeList[<index>].size" type="text" class="form-control  not-null"></div>
-  <div class="col-xs-4">
-    
-    <span>有货</span>
-            <input id="size" name="sizeList[<index>].available" value="true" type="radio" class="minimal" checked>
-            <span>无货</span>
-            <input id="size" name="sizeList[<index>].available" value="false" type="radio" class="minimal">
-  </div>
-</div>
-            
-            
-          </div>
-</div>
-<script src="plugins/iCheck/icheck.min.js"></script>
 <script type="text/javascript">
+$(".add-item").click(function() {
+    var template = $("#" + $(this).attr("id") + "-template")
+    if (template.length < 1) {
+        template = $("#" + $(this).attr("id") + "-" + $("input[name='strategy']:checked").val() + "-template")
+    }
+    var node = template.clone(true)
+    node.attr("id", null)
+    var container = $(this).parents(".form-group")
+    var index = container.attr("index")
+    if (!index) {
+        index = 0
+    } else {
+        index = 1 + parseInt(index)
+    }
+    node.find(".form-control").each(function() {
+        $(this).attr("name", $(this).attr("name").replace("<index>", index))
+    })
+    container.append(node)
+    node.show()
+    container.attr("index", index)
+})
 
-//iCheck for checkbox and radio inputs
-$('input[type="radio"].minimal').iCheck({
-  radioClass: 'iradio_minimal-blue'
+$(".del-item").click(function() {
+    var container = $(this).parents(".form-group")
+    var index = parseInt(container.attr("index"))
+    if (index > 0) {
+        container.children("div:last-child").remove();
+        container.attr("index", index - 1)
+    }
+
+})
+
+$("input:radio[name='strategy']").change(function(event) { //拨通
+    changeShoesClass(event.target)
+
+    $("#sizeList-div").children("div").remove()
+    $("#sizeList-add-btn").trigger("click")
 });
 
-$(".add-item").click(function(){
-  var template= $("#"+$(this).attr("id")+"-template")
-  var node= template.clone(true)
-  node.attr("id",null)
-  var container = $(this).parents(".form-group")
-  var index = container.attr("index")
-  if(!index){
-    index=0
-  }else{
-    index = 1+parseInt(index)
-  }
-  node.find("input").each(function(){
-    $(this).attr("name",$(this).attr("name").replace("<index>",index))
-  })
-  container.append(node)
-  node.show()
-  container.attr("index",index)
-  $('input[type="radio"].minimal').iCheck({
-    radioClass: 'iradio_minimal-blue'
-  });
-})
-
-$(".del-item").click(function(){
- var container = $(this).parents(".form-group")
- var index = parseInt(container.attr("index"))
- if(index > 0){
-  container.children("div:last-child").remove();
-  container.attr("index", index-1)
+var changeShoesClass = function(target){
+var strArray = $(target).val().split("_")
+    if (strArray.length > 1 && strArray[1] == "shoes") {
+        $(".shoes-class").show()
+        $(".shoes-class").find(".form-control").attr("disabled", false);
+    } else {
+        $(".shoes-class").hide()
+        $(".shoes-class").find(".form-control").attr("disabled", true);
+    }
 }
 
-})
-
-validate = function(){
-  if($("#files").find("input").length<1){
-    alert("请上传图片")
-    
-    window.scroll(0 ,$("#files").offset().top-120)
-    return false
-  }
-
-  var validateSuccess = true
-  var offsetTop
-  $("#form").find(".not-null").each(function(index, obj){
-    var container = $(obj).parents(".form-group")
-    if(container.hasClass("has-error")){
-      container.removeClass("has-error")
+validate = function() {
+    if ($("#files").find("input").length < 1) {
+        alert("请上传图片")
+        window.scroll(0, $("#files").offset().top - 120)
+        return false
     }
-    if(!$(obj).val()){
-      validateSuccess = false;
-      if(!offsetTop){
-        offsetTop = $(obj).offset().top-25
-      }
-      container.addClass("has-error")
+
+    var validateSuccess = true
+    var offsetTop
+    $("#form").find(".not-null").each(function(index, obj) {
+        var container = $(obj).parents(".form-group")
+        if (container.hasClass("has-error")) {
+            container.removeClass("has-error")
+        }
+        if (!$(obj).val()) {
+            validateSuccess = false;
+            if (!offsetTop) {
+                offsetTop = $(obj).offset().top - 25
+            }
+            container.addClass("has-error")
+        }
+    })
+    if (!validateSuccess) {
+        window.scroll(0, offsetTop)
     }
-  })
-  if(!validateSuccess){
-    console.log(offsetTop)
-    window.scroll(0 ,offsetTop)
-  }
-  return validateSuccess
+    return validateSuccess
 }
-$("#submit").click(function(){
-  if(!validate()){
-    return
-  }
-  var params = $("#form").toObject()
-  var url = "/api/spu"
-  if(params["_id"]){
-    url+="/update"
-  }else{
-    url+="/add"
-  }
-  post(url,$("#form").toObject(),function(data){
-    alert("添加商品成功")
-  });
+$("#submit").click(function() {
+    if(!validate()){
+      return
+    }
+    var params = $("#form").toObject()
+    var url = "/api/spu"
+    if (params["_id"]) {
+        url += "/update"
+    } else {
+        url += "/add"
+    }
+    post(url, $("#form").toObject(), function(data) {
+        alert("添加商品成功")
+    });
 })
 
 
-var id = getParameterByName("id")
-if(id){
-  post("/api/spu/findOne",{_id:id},function(data){
-    $(".add-item").each(function(){
-      var id = $(this).attr("id")
-      var dataNode = id.substring(0,id.indexOf("-"))
-      var button = $(this)
-      if(data[dataNode]){
-        $(data[dataNode]).each(function(){
-          button.trigger("click")
+var id = window.localStorage.getItem("param")
+if (id) {
+    window.localStorage.removeItem("param")
+    post("/api/spu/findOne", {
+        _id: id
+    }, function(data) {
+        var target = $("input[name='strategy'][value="+data["strategy"]+"]")
+        target.attr("checked",true)
+        changeShoesClass(target)
+        $(".add-item").each(function() {
+            var id = $(this).attr("id")
+            var dataNode = id.substring(0, id.indexOf("-"))
+            var button = $(this)
+            if (data[dataNode]) {
+                $(data[dataNode]).each(function() {
+                    button.trigger("click")
+                })
+            } else {
+                button.trigger("click")
+            }
         })
-      }else{
+
+        $("#image_box").load("page/upload.html", null, function() {
+            var outIndex = -1;
+            $(data["images"]).each(function(index, obj) {
+                $("#files").append("<div><a target=\"_blank\" href=\"" + obj.image + "\"><p><image width=\"100\" height=\"100\" src=\"" + obj.image + "\"><br></p></a><input type=\"hidden\" name=\"images[" + index + "].image\" value=\"" + obj.image + "\"><input type=\"hidden\" name=\"images[" + index + "].deleteUrl\" value=\"" + obj.deleteUrl + "\"><button class=\"btn btn-warn\" onclick=\"deleteImage(&quot;" + obj.deleteUrl + "&quot;,this)\">Delete</button></div>")
+                outIndex = index
+            })
+            $("#files").attr("index", outIndex)
+        })
+
+        js2form("form", data)
+        $("#form").append("<input type='hidden' name='_id' value='" + id + "'/>")
+        $("#submit").text("更新")
+    })
+} else {
+    $("#image_box").load("page/upload.html")
+    $(".add-item").each(function() {
+        var id = $(this).attr("id")
+        var dataNode = id.substring(0, id.indexOf("-"))
+        var button = $(this)
         button.trigger("click")
-      }
-
-    })
-
-    $("#image_box").load("page/upload.html",null,function(){
-      var index = -1;
-      $(data["images"]).each(function(index,obj){
-        $("#files").append("<div><a target=\"_blank\" href=\""+obj.image+"\"><p><image width=\"100\" height=\"100\" src=\""+obj.image+"\"><br></p></a><input type=\"hidden\" name=\"images["+index+"].image\" value=\""+obj.image+"\"><input type=\"hidden\" name=\"images["+index+"].deleteUrl\" value=\""+obj.deleteUrl+"\"><button class=\"btn btn-warn\" onclick=\"deleteImage(&quot;"+obj.deleteUrl+"&quot;,this)\">Delete</button></div>")
-        index += 1
-      })
-      $("#files").attr("index",index)
-    })
-
-    js2form("form",data)
-    $("#form").append("<input type='hidden' name='_id' value='"+id+"'/>")
-    $("#submit").text("更新")
-  })
-}else{
-  $("#image_box").load("page/upload.html")
-  $(".add-item").each(function(){
-      var id = $(this).attr("id")
-      var dataNode = id.substring(0,id.indexOf("-"))
-      var button = $(this)
-      button.trigger("click")
     })
 }
-
-
-
-
+window.scroll(0, 0)
 </script>
