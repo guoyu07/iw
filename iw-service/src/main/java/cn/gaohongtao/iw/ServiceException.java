@@ -1,13 +1,5 @@
 package cn.gaohongtao.iw;
 
-import com.google.common.base.Charsets;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
-import java.net.URLEncoder;
-
 /**
  * tt
  * Created by gaoht on 15/6/29.

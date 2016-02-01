@@ -4,7 +4,7 @@
   ],
   "mongoConfig": {
     "seeds": [
-      "127.0.0.1",
+      "mongodb.iwshoes.cn",
       "27017"
     ],
     "maxConnectionsPerHost": 300

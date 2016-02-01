@@ -17,7 +17,7 @@ public class ServiceExceptionMapper implements ExceptionMapper<ServiceException>
 
     public Response toResponse(ServiceException ex) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("{errcode:" + ex.getErrCode() + ",errmsg:\"" + ex.getErrMsg() + "\"}")
+                .entity("{\"errcode\":" + ex.getErrCode() + ",\"errmsg\":\"" + ex.getErrMsg() + "\"}")
                 .type(MediaType.APPLICATION_JSON).build();
     }
 

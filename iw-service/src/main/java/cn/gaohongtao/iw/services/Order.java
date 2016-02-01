@@ -1,23 +1,8 @@
 package cn.gaohongtao.iw.services;
 
-import cn.gaohongtao.iw.ServiceException;
-import cn.gaohongtao.iw.common.Constant;
-import cn.gaohongtao.iw.common.Hash;
-import cn.gaohongtao.iw.common.Https;
-import cn.gaohongtao.iw.common.MongoUtil;
-import cn.gaohongtao.iw.protocol.iw.OrderPlaceRequest;
-import cn.gaohongtao.iw.protocol.iw.OrderPlaceResponse;
-import cn.gaohongtao.iw.protocol.wechat.NotifyPayRequest;
-import cn.gaohongtao.iw.protocol.wechat.NotifyPayResponse;
-import cn.gaohongtao.iw.protocol.wechat.UnifiedOrderRequest;
-import cn.gaohongtao.iw.protocol.wechat.UnifiedOrderResponse;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.result.UpdateResult;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -28,8 +13,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
 
+import cn.gaohongtao.iw.ServiceException;
+import cn.gaohongtao.iw.common.Constant;
+import cn.gaohongtao.iw.common.Hash;
+import cn.gaohongtao.iw.common.MongoUtil;
+import cn.gaohongtao.iw.protocol.iw.OrderPlaceRequest;
+import cn.gaohongtao.iw.protocol.iw.OrderPlaceResponse;
+import cn.gaohongtao.iw.protocol.wechat.NotifyPayRequest;
+import cn.gaohongtao.iw.protocol.wechat.NotifyPayResponse;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,47 +44,53 @@ public class Order {
     @Consumes(MediaType.APPLICATION_JSON)
     public OrderPlaceResponse place(OrderPlaceRequest request, @Context HttpServletRequest req) throws ServiceException {
         log.debug("place order request: {}", request);
-        UnifiedOrderRequest unifiedOrderRequest = new UnifiedOrderRequest();
+//        UnifiedOrderRequest unifiedOrderRequest = new UnifiedOrderRequest();
         DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         String date = format.format(new Date());
         String orderId = date + Hash.randomString(6);
-        unifiedOrderRequest.setOut_trade_no(orderId);
-        unifiedOrderRequest.setNonce_str(Hash.randomString(32));
-        unifiedOrderRequest.setTotal_fee(Integer.valueOf(request.getItem().get("cost")));
-        unifiedOrderRequest.setSpbill_create_ip(req.getRemoteAddr());
-        unifiedOrderRequest.setOpenid(request.getUserId());
-
-        unifiedOrderRequest.setSign(Hash.signature(unifiedOrderRequest, Constant.PAY_KEY));
-        UnifiedOrderResponse unifiedOrderResponse;
-        try {
-            unifiedOrderResponse = new Https().path("https://api.mch.weixin.qq.com/pay/unifiedorder").post(unifiedOrderRequest, UnifiedOrderResponse.class);
-        } catch (Exception e) {
-            log.error("request https://api.mch.weixin.qq.com/pay/unifiedorder interface error", e);
-            throw new ServiceException(e.getMessage());
-        }
-
+//        unifiedOrderRequest.setOut_trade_no(orderId);
+//        unifiedOrderRequest.setNonce_str(Hash.randomString(32));
+//        unifiedOrderRequest.setTotal_fee(Integer.valueOf(request.getItem().get("cost")));
+//        unifiedOrderRequest.setSpbill_create_ip(req.getRemoteAddr());
+//        unifiedOrderRequest.setOpenid(request.getUserId());
+//
+//        unifiedOrderRequest.setSign(Hash.signature(unifiedOrderRequest, Constant.PAY_KEY));
+//        UnifiedOrderResponse unifiedOrderResponse;
+//        try {
+//            unifiedOrderResponse = new Https().path("https://api.mch.weixin.qq.com/pay/unifiedorder").post(unifiedOrderRequest, UnifiedOrderResponse.class);
+//        } catch (Exception e) {
+//            log.error("request https://api.mch.weixin.qq.com/pay/unifiedorder interface error", e);
+//            throw new ServiceException(e.getMessage());
+//        }
+//
         OrderPlaceResponse response = new OrderPlaceResponse();
-        if (Constant.SUCCESS.equals(unifiedOrderResponse.getReturn_code())) {
-            if (Constant.SUCCESS.equals(unifiedOrderResponse.getResult_code())) {
-                response.setOrderId(orderId);
-                response.setPrepayId(unifiedOrderResponse.getPrepay_id());
-                response.setMessage(Constant.SUCCESS);
-            } else {
-                throw new ServiceException(String.format("err_code:%s err_msg:%s", unifiedOrderResponse.getErr_code(), unifiedOrderResponse.getErr_code_des()));
-            }
-        } else {
-            throw new ServiceException(unifiedOrderResponse.getReturn_msg());
-        }
+//        if (Constant.SUCCESS.equals(unifiedOrderResponse.getReturn_code())) {
+//            if (Constant.SUCCESS.equals(unifiedOrderResponse.getResult_code())) {
+//                response.setOrderId(orderId);
+//                response.setPrepayId(unifiedOrderResponse.getPrepay_id());
+//                response.setMessage(Constant.SUCCESS);
+//            } else {
+//                throw new ServiceException(String.format("err_code:%s err_msg:%s", unifiedOrderResponse.getErr_code(), unifiedOrderResponse.getErr_code_des()));
+//            }
+//        } else {
+//            throw new ServiceException(unifiedOrderResponse.getReturn_msg());
+//        }
 
         Document orderDoc = MongoUtil.convertToDocument(request);
         orderDoc.append("_id", orderId);
-        orderDoc.append("prepayId", response.getPrepayId());
+//        orderDoc.append("prepayId", response.getPrepayId());
+        orderDoc.append("prepayId", "-1");
         orderDoc.append("state", 0);
         orderDoc.append("order_date", date);
         orderDoc.append("pay_date", date);
         orderDoc.append("state_date", date);
         orderDoc.append("msg", "已经成功下单，等待支付结果");
         MongoUtil.getDatabase("order").getCollection("items").insertOne(orderDoc);
+        
+        //TODO 插入用户信息
+        response.setOrderId(orderId);
+        response.setPrepayId("-1");
+        response.setMessage(Constant.SUCCESS);
         return response;
     }
 
