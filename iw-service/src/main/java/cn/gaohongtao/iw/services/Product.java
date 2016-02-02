@@ -1,10 +1,5 @@
 package cn.gaohongtao.iw.services;
 
-import cn.gaohongtao.iw.common.MongoUtil;
-import cn.gaohongtao.iw.protocol.iw.ProductListRequest;
-import cn.gaohongtao.iw.protocol.iw.ProductListResponse;
-import com.google.common.base.Strings;
-import com.mongodb.client.MongoCollection;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,13 +15,22 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import cn.gaohongtao.iw.common.MongoUtil;
+import cn.gaohongtao.iw.protocol.iw.ProductListRequest;
+import cn.gaohongtao.iw.protocol.iw.ProductListResponse;
+import com.google.common.base.Strings;
+import com.mongodb.client.MongoCollection;
+import org.bson.BSON;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Filters.lt;
@@ -49,11 +53,21 @@ public class Product {
         log.debug("Item list request: {}", request);
 
         List<Bson> conditionFilters = new ArrayList<>();
-
-        if (request.getCondition() != null)
+    
+        if (request.getCondition() != null) {
+            if (request.getCondition().containsKey("size")) {
+                conditionFilters.add(elemMatch("sizeList", in("size", request.getCondition().get("size"))));
+                request.getCondition().remove("size");
+            }
+            if (request.getCondition().containsKey("colour")) {
+                conditionFilters.add(in("color", request.getCondition().get("colour")));
+                request.getCondition().remove("colour");
+            }
             for (String key : request.getCondition().keySet()) {
                 conditionFilters.add(in(key, request.getCondition().get(key)));
             }
+        }
+            
 
         DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         if (!Strings.isNullOrEmpty(request.getLastSymbol()))
@@ -72,7 +86,7 @@ public class Product {
         for (Document item : collection.find(filter)
                 .projection(and(eq("name", 1), eq("price", 1), eq("discount", 1), eq("sales", 1), eq("images", 1)))
                 .sort(eq("onsale_date", -1)).limit(request.getPageSize())) {
-            item.append("id", item.getString("_id"));
+            item.append("id", item.getObjectId("_id").toString());
             item.remove("_id");
             result.add(item);
         }
@@ -118,7 +132,7 @@ public class Product {
     public Document item(@QueryParam("productId") String productId) {
         log.debug("get item id: {}", productId);
 
-        return MongoUtil.getDatabase("product").getCollection("items").find(eq("_id", productId))
+        return MongoUtil.getDatabase("product").getCollection("items").find(eq("_id", new ObjectId(productId)))
                 .projection(and(eq("_id", 0), eq("images", 1), eq("name", 1), eq("price", 1)
                         , eq("discount", 1), eq("sizeList", 1), eq("itemStyle", 1), eq("desc", 1))).first();
     }
