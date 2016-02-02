@@ -3,7 +3,9 @@ package cn.gaohongtao.iw.services;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -22,15 +24,21 @@ import cn.gaohongtao.iw.protocol.iw.OrderPlaceRequest;
 import cn.gaohongtao.iw.protocol.iw.OrderPlaceResponse;
 import cn.gaohongtao.iw.protocol.wechat.NotifyPayRequest;
 import cn.gaohongtao.iw.protocol.wechat.NotifyPayResponse;
+import com.google.common.collect.Lists;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+
 /**
  * 订单服务
- * <p>
+ * <p/>
  * Created by gaoht on 15/7/21.
  */
 @Path("order")
@@ -42,11 +50,12 @@ public class Order {
     @Path("place")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Consumes(MediaType.APPLICATION_JSON)
-    public OrderPlaceResponse place(OrderPlaceRequest request, @Context HttpServletRequest req) throws ServiceException {
+    public synchronized OrderPlaceResponse place(OrderPlaceRequest request, @Context HttpServletRequest req) throws ServiceException {
         log.debug("place order request: {}", request);
 //        UnifiedOrderRequest unifiedOrderRequest = new UnifiedOrderRequest();
         DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-        String date = format.format(new Date());
+        Date now = new Date();
+        String date = format.format(now);
         String orderId = date + Hash.randomString(6);
 //        unifiedOrderRequest.setOut_trade_no(orderId);
 //        unifiedOrderRequest.setNonce_str(Hash.randomString(32));
@@ -76,18 +85,45 @@ public class Order {
 //            throw new ServiceException(unifiedOrderResponse.getReturn_msg());
 //        }
 
+        Document prodDoc = MongoUtil.getDatabase("product").getCollection("items").find(eq("_id", new ObjectId(request.getItem().get("itemId")))).first();
+        if (prodDoc == null) {
+            throw new ServiceException("不存在下单的商品");
+        }
+        request.getItem().put("name", prodDoc.getString("name"));
+        request.getItem().put("color", ((List) prodDoc.get("color")).get(0).toString());
+
+
         Document orderDoc = MongoUtil.convertToDocument(request);
         orderDoc.append("_id", orderId);
 //        orderDoc.append("prepayId", response.getPrepayId());
         orderDoc.append("prepayId", "-1");
-        orderDoc.append("state", 0);
-        orderDoc.append("order_date", date);
-        orderDoc.append("pay_date", date);
-        orderDoc.append("state_date", date);
+        orderDoc.append("state", "0");
+        orderDoc.append("order_date", now);
+        orderDoc.append("pay_date", now);
+        orderDoc.append("state_date", now);
         orderDoc.append("msg", "已经成功下单，等待支付结果");
         MongoUtil.getDatabase("order").getCollection("items").insertOne(orderDoc);
-        
-        //TODO 插入用户信息
+
+        MongoCollection<Document> col = MongoUtil.getDatabase("basic").getCollection("user");
+        Document user = col.find(eq("_id", request.getUserId()))
+                .first();
+        if (user == null) {
+            col.insertOne(new Document("_id", request.getUserId()).append("address", Lists.newArrayList(request.getAddressInfo())));
+        } else {
+            col.updateOne(new Document("_id", request.getUserId()), new Document("$addToSet", new Document("address", request.getAddressInfo())));
+        }
+        int sizeNumber = 0;
+        for (Document productDoc : (List<Document>) prodDoc.get("sizeList")) {
+            if (productDoc.getString("size").equals(request.getItem().get("size"))) {
+                sizeNumber = Integer.valueOf(productDoc.getString("count"));
+            }
+        }
+        if (sizeNumber < 1) {
+            throw new ServiceException("该号码已经售完");
+        }
+        MongoUtil.getDatabase("product").getCollection("items").updateOne(new Document("_id", new ObjectId(request.getItem().get("itemId"))).append("sizeList.size", request.getItem().get("size")),
+                new Document("$set", new Document("sizeList.$.count", --sizeNumber)));
+
         response.setOrderId(orderId);
         response.setPrepayId("-1");
         response.setMessage(Constant.SUCCESS);
