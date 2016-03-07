@@ -84,8 +84,8 @@ public class Product {
 
         List<Document> result = new ArrayList<>();
         for (Document item : collection.find(filter)
-                .projection(and(eq("name", 1), eq("price", 1), eq("discount", 1), eq("sales", 1), eq("images", 1)))
-                .sort(eq("onsale_date", -1)).limit(request.getPageSize())) {
+                .projection(and(eq("name", 1), eq("price", 1), eq("discount", 1), eq("sales", 1), eq("images", 1), eq("onSaleDate", 1)))
+                .sort(eq("onSaleDate", -1)).limit(request.getPageSize())) {
             item.append("id", item.getObjectId("_id").toString());
             item.remove("_id");
             result.add(item);
@@ -95,7 +95,7 @@ public class Product {
         if (request.getPageSize() == 0 || result.size() < request.getPageSize()) {
             response.setLastSymbol("LAST");
         } else {
-            response.setLastSymbol(format.format(result.get(result.size() - 1).getDate("onsale_date")));
+            response.setLastSymbol(format.format(result.get(result.size() - 1).getDate("onSaleDate")));
         }
         response.setItemList(result);
         log.debug("Item list response: {}", response);
