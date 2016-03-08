@@ -1,5 +1,13 @@
 package cn.gaohongtao.iw.services;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
 import cn.gaohongtao.iw.ServiceException;
 import cn.gaohongtao.iw.common.Constant;
 import cn.gaohongtao.iw.common.Https;
@@ -9,13 +17,7 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.List;
+import static com.mongodb.client.model.Filters.eq;
 
 /**
  * Hook of get openid
@@ -47,8 +49,14 @@ public class UserFromCode {
             for (Document document : MongoUtil.getDatabase("basic").getCollection("page_architecture").find()) {
                 archList.add(document);
             }
-            return new Document().append("user", new Document().append("userId", p.getOpenid()))
-                    .append("architecture", archList);
+    
+            Document userDoc = new Document().append("userId", p.getOpenid());
+            Document user = MongoUtil.getDatabase("basic").getCollection("user").find(eq("_id", p.getOpenid()))
+                    .first();
+            if (null != user && user.containsKey("ambCode")) {
+                userDoc.append("ambCode", user.getString("ambCode"));
+            }
+            return new Document().append("user", userDoc).append("architecture", archList);
         } else {
             log.error("request wechat oauth2 interface error {}", p);
             return new Document().append("errcode", p.getErrcode())
