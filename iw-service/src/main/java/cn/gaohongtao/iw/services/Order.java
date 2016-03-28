@@ -2,10 +2,10 @@ package cn.gaohongtao.iw.services;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -24,17 +24,17 @@ import cn.gaohongtao.iw.protocol.iw.OrderPlaceRequest;
 import cn.gaohongtao.iw.protocol.iw.OrderPlaceResponse;
 import cn.gaohongtao.iw.protocol.wechat.NotifyPayRequest;
 import cn.gaohongtao.iw.protocol.wechat.NotifyPayResponse;
-import com.google.common.collect.Interner;
 import com.google.common.collect.Lists;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.glassfish.grizzly.http.util.FastDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 
 /**
@@ -201,5 +201,25 @@ public class Order {
         }
 
         return Constant.SUCCESS;
+    }
+    
+    @GET
+    @Path("orderList")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<Document> orderList(@QueryParam("userId") String userId) throws ServiceException {
+        FindIterable<Document> orderItems = MongoUtil.getDatabase("order").getCollection("items").find(Filters.eq("userId", userId), Document.class);
+        List<Document> result = new ArrayList<>();
+        String format = "yyyy-MM-dd HH:mm:ss.SSS";
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        FastDateFormat fdf = new FastDateFormat(sdf);
+        for (Document each : orderItems) {
+            Document item = new Document();
+            result.add(item);
+            item.put("orderId", each.getString("_id"));
+            Document productItem = (Document) each.get("item");
+            item.put("price", null == productItem ? "0" : productItem.getString("cost"));
+            item.put("orderTime", fdf.format(each.getDate("order_date")));
+        }
+        return result;
     }
 }
